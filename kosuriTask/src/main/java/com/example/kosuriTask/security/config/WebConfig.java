@@ -8,8 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
@@ -18,14 +22,17 @@ public class WebConfig {
     private final CustomerRegistrationService registrationService;
     private final FinancierRegistrationService financierRegistrationService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final DataSource dataSource;
 
     @Autowired
     public WebConfig(CustomerRegistrationService registrationService,
                      FinancierRegistrationService financierRegistrationService,
-                     BCryptPasswordEncoder  bCryptPasswordEncoder){
+                     BCryptPasswordEncoder  bCryptPasswordEncoder,
+                     DataSource dataSource){
         this.registrationService=registrationService;
         this.financierRegistrationService=financierRegistrationService;
         this.bCryptPasswordEncoder=bCryptPasswordEncoder;
+        this.dataSource=dataSource;
 
     }
 
@@ -62,5 +69,12 @@ public class WebConfig {
         provider.setUserDetailsService(financierRegistrationService);
         provider.setPasswordEncoder(bCryptPasswordEncoder);
         return provider;
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        JdbcDaoImpl userDetailsService = new JdbcDaoImpl();
+        userDetailsService.setDataSource(dataSource);
+        return userDetailsService;
     }
 }
