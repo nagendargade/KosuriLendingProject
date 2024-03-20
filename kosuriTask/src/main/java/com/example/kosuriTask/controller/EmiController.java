@@ -5,11 +5,13 @@ import com.example.kosuriTask.service.EmiPatternService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasAuthority('FI') and hasAuthority('SUADM') and hasAuthority('CR')")
 @RequestMapping("/api/emi")
 public class EmiController {
     private final EmiPatternService emiPatternService;

@@ -1,0 +1,10 @@
+
+{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(žÏÌÔûÿÿÿÿ8ä‰º«å1
+X
+java:S1068"6Remove this unused "financierLogInRepo" private field.(µó¥åúÿÿÿÿ8ï‰º«å1
+Q
+java:S1068"/Remove this unused "modelMapper" private field.(«ÞËãþÿÿÿÿ8ð‰º«å1
+V
+java:S1068"9Remove this unused "bCryptPasswordEncoder" private field.(¾§©¶8ð‰º«å1
+K
+java:S1068".Remove this unused "jwtService" private field.(ïþº¯8ð‰º«å1

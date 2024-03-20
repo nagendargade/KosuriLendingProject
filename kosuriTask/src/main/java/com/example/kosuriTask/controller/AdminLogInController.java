@@ -1,6 +1,7 @@
 package com.example.kosuriTask.controller;
 
 import com.example.kosuriTask.dto.AdminLoginDto;
+import com.example.kosuriTask.dto.AdminLoginRespDto;
 import com.example.kosuriTask.entity.AdminLogIn;
 import com.example.kosuriTask.exceptionHandling.ExceptionHandling;
 import com.example.kosuriTask.service.AdminLogInService;
@@ -17,7 +18,7 @@ public class AdminLogInController {
     private AdminLogInService adminLogInService;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginDto> loginAdmin(@RequestBody AdminLoginDto adminLoginDto){
+    public ResponseEntity<AdminLoginRespDto> loginAdmin(@RequestBody AdminLoginRespDto adminLoginDto){
         return new ResponseEntity<>(adminLogInService.loginWithEmailAndPhoneNumber(adminLoginDto), HttpStatus.OK);
     }
 

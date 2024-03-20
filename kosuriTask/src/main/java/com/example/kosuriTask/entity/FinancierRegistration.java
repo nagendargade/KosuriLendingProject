@@ -21,7 +21,7 @@ import java.util.Date;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class FinancierRegistration implements UserDetails,Registration {
+public class FinancierRegistration implements Registration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long fUserId;
@@ -42,19 +42,15 @@ public class FinancierRegistration implements UserDetails,Registration {
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
-//    @OneToMany(mappedBy = "financierRegistration",fetch = FetchType.LAZY)
-//    private List<Token> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String rolePrefix="ROLE_";
-        String roleName= rolePrefix + this.userType.name();
-        return Collections.singleton(new SimpleGrantedAuthority(roleName));
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + getUserType().name()));
     }
 
     @Override
     public String getUsername() {
-        return this.email +"_"+ this.phoneNumber;
+        return this.email;
     }
 
     @Override

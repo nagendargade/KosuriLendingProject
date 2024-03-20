@@ -11,10 +11,12 @@ import com.example.kosuriTask.repository.BusinessDetailsRepo;
 import com.example.kosuriTask.repository.ServiceCategoryRepo;
 import com.example.kosuriTask.service.ServiceCategoryService;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ServiceCategoryServiceImpl implements ServiceCategoryService {
 
     @Autowired

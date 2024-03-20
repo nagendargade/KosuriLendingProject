@@ -1,0 +1,6 @@
+
+u	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ŸÞÛ8œé¼µã1
+_
+java:S6813"BRemove this field injection and use constructor injection instead.(êæÄÞ8ñé¼µã1
+ˆ
+java:S3305"fInject this field value directly into "customDaoAuthenticationProvider", the only method that uses it.(à¯Þ‘úÿÿÿÿ8ÞòÃµã1

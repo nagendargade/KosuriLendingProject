@@ -4,6 +4,7 @@ import com.example.kosuriTask.dto.CustomerLoginDto;
 import com.example.kosuriTask.entity.CustomerLogIn;
 import com.example.kosuriTask.exceptionHandling.ExceptionHandling;
 import com.example.kosuriTask.repository.CustomerLoginRepo;
+import com.example.kosuriTask.security.config.JwtService;
 import com.example.kosuriTask.service.CustomerLoginService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,16 @@ public class CustomerLoginServiceImpl implements CustomerLoginService {
     private final CustomerLoginRepo customerLoginRepo;
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtService jwtService;
     @Autowired
     public CustomerLoginServiceImpl(CustomerLoginRepo customerLoginRepo,
                                     ModelMapper modelMapper,
-                                    BCryptPasswordEncoder bCryptPasswordEncoder){
+                                    BCryptPasswordEncoder bCryptPasswordEncoder,
+                                    JwtService jwtService){
         this.customerLoginRepo=customerLoginRepo;
         this.modelMapper=modelMapper;
         this.bCryptPasswordEncoder=bCryptPasswordEncoder;
+        this.jwtService=jwtService;
     }
 
     @Override
@@ -31,11 +35,28 @@ public class CustomerLoginServiceImpl implements CustomerLoginService {
         CustomerLogIn customerLogIn=customerLoginRepo.findByEmailOrPhoneNumber(customerLoginDto.getEmail(),customerLoginDto.getPhoneNumber())
                 .orElseThrow(()-> new ExceptionHandling("Invalid credentials"));
         if(bCryptPasswordEncoder.matches(customerLoginDto.getPassword(),customerLogIn.getPassword())){
-            return modelMapper.map(customerLogIn, CustomerLoginDto.class);
+           return modelMapper.map(customerLogIn, CustomerLoginDto.class);
+
         }else{
             throw new ExceptionHandling("Invalid credentials");
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //    @Override

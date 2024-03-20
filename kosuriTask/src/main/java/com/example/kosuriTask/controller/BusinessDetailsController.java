@@ -6,11 +6,13 @@ import com.example.kosuriTask.service.BusinessDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.kosuriTask.exceptionHandling.ExceptionHandling;
 
 
 @RestController
+@PreAuthorize("hasAuthority('FI') and hasAuthority('SUADM')")
 @RequestMapping("/api/businessDetails")
 public class BusinessDetailsController {
     private final BusinessDetailsService  businessDetailsService;

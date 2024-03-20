@@ -22,7 +22,7 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerRegistration implements UserDetails,Registration {
+public class CustomerRegistration implements Registration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long cUserId;
@@ -47,14 +47,12 @@ public class CustomerRegistration implements UserDetails,Registration {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String rolePrefix="ROLE_";
-        String roleName= rolePrefix + this.userType.name();
-        return Collections.singleton(new SimpleGrantedAuthority(roleName));
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + getUserType().name()));
     }
 
     @Override
     public String getUsername() {
-        return this.email +"_"+ this.phoneNumber;
+        return this.email;
     }
 
     @Override
@@ -74,7 +72,7 @@ public class CustomerRegistration implements UserDetails,Registration {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.status != null && this.status;
     }
 
 

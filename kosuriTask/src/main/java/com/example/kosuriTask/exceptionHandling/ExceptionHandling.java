@@ -1,10 +1,15 @@
 package com.example.kosuriTask.exceptionHandling;
 
 public class ExceptionHandling extends  RuntimeException{
-    public ExceptionHandling(String message) {
-        super(message);
+    private final String errorMessage;
+
+    public ExceptionHandling(String errorMessage) {
+        super(errorMessage);
+        this.errorMessage = errorMessage;
     }
+
     public String getErrorMessage() {
-        return getMessage();
+        return errorMessage;
     }
+
 }

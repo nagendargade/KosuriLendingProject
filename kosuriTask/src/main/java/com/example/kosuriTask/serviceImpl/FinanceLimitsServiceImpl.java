@@ -13,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class FinanceLimitsServiceImpl implements FinanceLimitsService {
 
     @Autowired
@@ -27,6 +30,8 @@ public class FinanceLimitsServiceImpl implements FinanceLimitsService {
     private ModelMapper modelMapper;
     @Autowired
     private BusinessDetailsRepo businessDetailsRepo;
+
+
     @Override
     public FinanceLimitsDto addFinanceLimits(FinanceLimitsDto financeLimitsDto, String contactEmail) {
         BusinessDetails details=businessDetailsRepo.findByContactEmail(contactEmail).get();

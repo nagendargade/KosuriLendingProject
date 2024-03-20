@@ -11,10 +11,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AssetCategoryServiceImpl implements AssetCategoryService {
     @Autowired
     private AssetCategoryRepo assetCategoryRepo;
@@ -25,10 +28,11 @@ public class AssetCategoryServiceImpl implements AssetCategoryService {
 
     @Override
     public AssetCategoryDto addAsetCtgry(AssetCategoryDto assetCategoryDto, String contactEmail) {
-        BusinessDetails businessDetails= businessDetailsRepo.findByContactEmail(contactEmail).get();
-        if(businessDetails!=null){
+        Optional<BusinessDetails> businessDetails= businessDetailsRepo.findByContactEmail(contactEmail);
+        if(businessDetails.isPresent()){
+            BusinessDetails details=businessDetails.get();
             AssetCategory assetCategory= modelMapper.map(assetCategoryDto, AssetCategory.class);
-            assetCategory.setBusinessDetails(businessDetails);
+            assetCategory.setBusinessDetails(details);
             AssetCategory financeTenure1=assetCategoryRepo.save(assetCategory);
             return modelMapper.map(financeTenure1, AssetCategoryDto.class);
         }else{
@@ -39,14 +43,15 @@ public class AssetCategoryServiceImpl implements AssetCategoryService {
 
     @Override
     public List<AssetCategoryDto> getAsetCtgryByContactEmail(String contactEmail) {
-        BusinessDetails details=businessDetailsRepo.findByContactEmail(contactEmail).orElse(null);
+        BusinessDetails details=businessDetailsRepo.findByContactEmail(contactEmail)
+                .orElseThrow(()-> new ExceptionHandling("BusinessDetails not found for contact email: " + contactEmail));
         List<AssetCategory> assetCategory= assetCategoryRepo.findByBusinessDetails(details);
-        if(assetCategory!=null){
+        if(assetCategory.isEmpty()){
             return assetCategory.stream().map(
                     assetCategory1 -> modelMapper.map(assetCategory1, AssetCategoryDto.class)
             ).collect(Collectors.toList());
         }else{
-            throw  new ExceptionHandling("ServiceCategory not found for contact email: " + contactEmail);
+            throw  new ExceptionHandling("AssetCategory not found for contact email: " + contactEmail);
         }
     }
 
@@ -61,7 +66,7 @@ public class AssetCategoryServiceImpl implements AssetCategoryService {
             AssetCategory assetCategory1=assetCategoryRepo.save(assetCategory);
             return modelMapper.map(assetCategory1, AssetCategoryDto.class);
         }else{
-            throw new ExceptionHandling("ServiceCategory not found for contact email: " + contactEmail);
+            throw new ExceptionHandling("AssetCategory not found for contact email: " + contactEmail);
         }
     }
 

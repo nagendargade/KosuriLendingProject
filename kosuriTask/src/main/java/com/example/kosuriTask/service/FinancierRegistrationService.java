@@ -1,11 +1,16 @@
 package com.example.kosuriTask.service;
 
-import com.example.kosuriTask.dto.CustomerRegistrationDto;
+import com.example.kosuriTask.dto.LoginResponseDto;
+import com.example.kosuriTask.dto.RegistrationResponseDto;
+import com.example.kosuriTask.dto.FinancierLogInDto;
 import com.example.kosuriTask.dto.FinancierRegistrationDto;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface FinancierRegistrationService extends UserDetailsService {
+public interface FinancierRegistrationService {
 
-    String registerFinancier(FinancierRegistrationDto financierRegistrationDto);
+    RegistrationResponseDto registerFinancier(FinancierRegistrationDto financierRegistrationDto);
+
+    LoginResponseDto loginFinancier(FinancierLogInDto loginDto);
+
+
 
 }

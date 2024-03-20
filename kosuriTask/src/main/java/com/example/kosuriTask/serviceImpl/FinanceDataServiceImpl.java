@@ -11,10 +11,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class FinanceDataServiceImpl implements FinanceDataService {
     @Autowired
     private FinanceDataRepo financeDataRepo;
@@ -22,24 +25,27 @@ public class FinanceDataServiceImpl implements FinanceDataService {
     private BusinessDetailsRepo businessDetailsRepo;
     @Autowired
     private ModelMapper modelMapper;
+
+
     @Override
     public FinanceDataDto addFinanceData(FinanceDataDto financeDataDto, String contactEmail) {
-        BusinessDetails businessDetails= businessDetailsRepo.findByContactEmail(contactEmail).get();
-        if(businessDetails!=null){
+        BusinessDetails businessDetails= businessDetailsRepo.findByContactEmail(contactEmail).
+                orElseThrow(()-> new NoSuchElementException("BusinessDetails not found for contact email:" + contactEmail));
+
             FinanceData financeData= modelMapper.map(financeDataDto, FinanceData.class);
             financeData.setBusinessDetails(businessDetails);
-            FinanceData financeData1=financeDataRepo.save(financeData);
-            return modelMapper.map(financeData1, FinanceDataDto.class);
-        }else{
-            throw  new ExceptionHandling("FinanceData not found for contact email: " + contactEmail);
-        }
+            financeData=financeDataRepo.save(financeData);
+            businessDetails.getFinanceDataList().add(financeData);
+            return modelMapper.map(financeData, FinanceDataDto.class);
+
     }
 
     @Override
     public List<FinanceDataDto> getFinanceDataByContactEmail(String contactEmail) {
-        BusinessDetails details=businessDetailsRepo.findByContactEmail(contactEmail).orElse(null);
-        List<FinanceData> financeData = financeDataRepo.findByBusinessDetails(details);
+        BusinessDetails details=businessDetailsRepo.findByContactEmail(contactEmail).
+                orElseThrow(() -> new ExceptionHandling("BusinessDetails not found for contact email: " + contactEmail));
 
+        List<FinanceData> financeData = financeDataRepo.findByBusinessDetails(details);
         if(financeData!=null){
             return financeData.stream().map(
                     financeData1 -> modelMapper.map(financeData1, FinanceDataDto.class)

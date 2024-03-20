@@ -2,37 +2,36 @@ package com.example.kosuriTask.security.config;
 
 import com.example.kosuriTask.service.CustomerRegistrationService;
 import com.example.kosuriTask.service.FinancierRegistrationService;
+import com.example.kosuriTask.serviceImpl.CustomUserService;
+import com.example.kosuriTask.serviceImpl.CustomerRegistrationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
 public class WebConfig {
 
-    private final CustomerRegistrationService registrationService;
-    private final FinancierRegistrationService financierRegistrationService;
+    @Autowired
+    private CustomUserService registrationService;
+
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final DataSource dataSource;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
-    public WebConfig(CustomerRegistrationService registrationService,
-                     FinancierRegistrationService financierRegistrationService,
-                     BCryptPasswordEncoder  bCryptPasswordEncoder,
-                     DataSource dataSource){
-        this.registrationService=registrationService;
-        this.financierRegistrationService=financierRegistrationService;
+    public WebConfig(BCryptPasswordEncoder  bCryptPasswordEncoder,
+                     JwtAuthenticationFilter jwtAuthenticationFilter){
         this.bCryptPasswordEncoder=bCryptPasswordEncoder;
-        this.dataSource=dataSource;
+        this.jwtAuthenticationFilter=jwtAuthenticationFilter;
+
 
     }
 
@@ -42,39 +41,25 @@ public class WebConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/customerRegistration/**","/api/financierRegistration/**").permitAll()
-                .antMatchers("/api/finacirLogin/**","/api/customrLogin/**","/api/admin/**").permitAll()
+                .antMatchers("/api/financier/**","/api/customer/**","/api/admin/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
-                .permitAll().and()
+                .formLogin().permitAll().and()
                 .logout().permitAll();
 
-        http.authenticationProvider(customerDaoAuthenticationProvider());
-        http.authenticationProvider(financierDaoAuthenticationProvider());
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.authenticationProvider(customDaoAuthenticationProvider());
         return http.build();
     }
 
 
     @Bean
-    public DaoAuthenticationProvider customerDaoAuthenticationProvider() {
+    public DaoAuthenticationProvider customDaoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(registrationService);
         provider.setPasswordEncoder(bCryptPasswordEncoder);
         return provider;
     }
-    @Bean
-    public DaoAuthenticationProvider financierDaoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(financierRegistrationService);
-        provider.setPasswordEncoder(bCryptPasswordEncoder);
-        return provider;
-    }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        JdbcDaoImpl userDetailsService = new JdbcDaoImpl();
-        userDetailsService.setDataSource(dataSource);
-        return userDetailsService;
-    }
+
 }

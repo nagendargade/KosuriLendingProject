@@ -19,7 +19,6 @@ public class BusinessDetails implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
     private String name;
-    @Column(name = "contactEmail", unique = true)
     private String contactEmail;
     private String financierId;
     private long phoneNumber;
@@ -36,6 +35,8 @@ public class BusinessDetails implements Serializable {
     @UpdateTimestamp
     private Date updatedDetails;
 
+    @OneToMany(mappedBy = "businessDetails", cascade = CascadeType.ALL)
+    private List<FinanceData> financeDataList;
 
     @OneToMany(mappedBy = "businessDetails", cascade = CascadeType.ALL)
     private List<EmiPattern> emiPattern;
@@ -56,8 +57,6 @@ public class BusinessDetails implements Serializable {
     private  int generateSequenceNumber() {
         return sequenceCounter++;
     }
-
-
 
 
 }

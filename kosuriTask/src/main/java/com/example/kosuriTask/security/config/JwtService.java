@@ -2,21 +2,21 @@ package com.example.kosuriTask.security.config;
 
 
 
-import com.example.kosuriTask.entity.Registration;
+import com.example.kosuriTask.entity.CustomerRegistration;
+import com.example.kosuriTask.entity.FinancierRegistration;
 import com.example.kosuriTask.entity.enumValues.UserType;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 import java.security.Key;
 import java.util.*;
@@ -31,8 +31,6 @@ public class JwtService {
     private long jwtExpiration;
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -42,6 +40,7 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
@@ -50,33 +49,34 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
     private Key getSignInKey() {
-        return Keys.hmacShaKeyFor(Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded());
-
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
+
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userType", getUserTypeFromUserDetails(userDetails));
+        return buildToken(extraClaims, userDetails, jwtExpiration, "your-issuer", "your-audience");
     }
 
-    public String generateToken(Map<String, Object> extraClaims,
-            UserDetails userDetails) {
-        extraClaims.put("userType", getUserTypeFormUserDetails(userDetails));
-        return buildToken(extraClaims, userDetails, jwtExpiration,"your-issuer","your-audience");
-    }
-
-    private UserType getUserTypeFormUserDetails(UserDetails userDetails) {
-        if(userDetails instanceof  User){
-            User user=(User) userDetails;
+    private UserType getUserTypeFromUserDetails(UserDetails userDetails) {
+        if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_FI"))) {
+            return UserType.FI;
+        } else if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SUADM"))) {
+            return UserType.SUADM;
+        } else if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CR"))) {
+            return UserType.CR;
         }
         return null;
     }
 
-    public String generateRefreshToken(UserDetails userDetails){
-        return buildToken(new HashMap<>(), userDetails, refreshExpiration,"your-issuer","your-audience");
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration, "your-issuer", "your-audience");
     }
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails,
-            long expiration, String issuer, String audience) {
+                              long expiration, String issuer, String audience) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -102,15 +102,24 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public UserDetails getUserDetails(Registration registration) {
+    public UserDetails getUserDetails(FinancierRegistration registration) {
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + registration.getUserType().name()));
 
-        String encodePassword=bCryptPasswordEncoder.encode(registration.getPassword());
+        return new User(
+                registration.getEmail(),
+                registration.getPassword(),
+                authorities
+        );
+    }
+
+    public UserDetails getUserDetails(CustomerRegistration registration) {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + registration.getUserType().name()));
 
         return new User(
                 registration.getEmail(),
-                encodePassword,
+                registration.getPassword(),
                 authorities
         );
     }

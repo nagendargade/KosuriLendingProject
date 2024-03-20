@@ -11,9 +11,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class BusinessUserVerificationServiceImpl implements BusinessUserVerificationService {
     @Autowired
     private BusinessUserVerificationRepo businessUserVerificationRepo;
@@ -23,10 +26,12 @@ public class BusinessUserVerificationServiceImpl implements BusinessUserVerifica
     private ModelMapper modelMapper;
     @Override
     public BusinessUserVerificationDto addUserVerification(BusinessUserVerificationDto businessUserVerificationDto, String financierId) {
-        BusinessDetails businessDetails=businessDetailsRepo.findByFinancierId(financierId).get();
-        if(businessDetails!=null){
+        Optional<BusinessDetails> businessDetails=businessDetailsRepo.findByFinancierId(financierId);
+        if(businessDetails.isPresent()){
+            BusinessDetails details=businessDetails.get();
+
             BusinessUserVerification businessUserVerification=modelMapper.map(businessUserVerificationDto, BusinessUserVerification.class);
-            businessUserVerification.setBusinessDetails(businessDetails);
+            businessUserVerification.setBusinessDetails(details);
             BusinessUserVerification businessUserVerification1=businessUserVerificationRepo.save(businessUserVerification);
             return modelMapper.map(businessUserVerification1, BusinessUserVerificationDto.class);
         }else{

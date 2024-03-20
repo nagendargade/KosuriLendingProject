@@ -11,4 +11,8 @@ public interface CustomerLoginRepo extends JpaRepository<CustomerLogIn, Long> {
     CustomerLogIn findByPhoneNumberAndPassword(String phoneNumber, String password);
 
     Optional<CustomerLogIn> findByEmailOrPhoneNumber(String email, String phoneNumber);
+
+    Optional<CustomerLogIn> findByEmail(String email);
+
+    Optional<CustomerLogIn> findByPhoneNumber(String phoneNumber);
 }

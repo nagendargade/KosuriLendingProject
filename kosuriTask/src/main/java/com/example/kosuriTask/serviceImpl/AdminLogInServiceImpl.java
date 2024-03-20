@@ -1,12 +1,15 @@
 package com.example.kosuriTask.serviceImpl;
 
 import com.example.kosuriTask.dto.AdminLoginDto;
+import com.example.kosuriTask.dto.AdminLoginRespDto;
 import com.example.kosuriTask.entity.AdminLogIn;
 import com.example.kosuriTask.exceptionHandling.ExceptionHandling;
 import com.example.kosuriTask.repository.AdminLogInRepo;
+import com.example.kosuriTask.security.config.JwtService;
 import com.example.kosuriTask.service.AdminLogInService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,28 +18,52 @@ public class AdminLogInServiceImpl implements AdminLogInService {
     private final AdminLogInRepo  adminLogInRepo;
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtService jwtService;
     @Autowired
     public AdminLogInServiceImpl(AdminLogInRepo adminLogInRepo,
                                  ModelMapper modelMapper,
-                                 BCryptPasswordEncoder bCryptPasswordEncoder){
+                                 BCryptPasswordEncoder bCryptPasswordEncoder,
+                                 JwtService jwtService){
         this.adminLogInRepo=adminLogInRepo;
         this.modelMapper=modelMapper;
         this.bCryptPasswordEncoder=bCryptPasswordEncoder;
+        this.jwtService=jwtService;
     }
 
 
+//    @Override
+//    public AdminLoginDto loginWithEmailAndPhoneNumber(AdminLoginDto adminLoginDto) {
+//        AdminLogIn adminLogIn = adminLogInRepo.findByEmailOrPhoneNumber(adminLoginDto.getEmail(), adminLoginDto.getPhoneNumber())
+//                .orElseThrow(() -> new ExceptionHandling("Invalid credentials"));
+//
+//        // Check if the provided password matches the stored password
+//        if (passwordMatches(adminLoginDto.getPassword(), adminLogIn.getPassword())) {
+//            return modelMapper.map(adminLogIn, AdminLoginDto.class);
+//        } else {
+//            throw new ExceptionHandling("Invalid credentials");
+//        }
+//    }
+
+
+
     @Override
-    public AdminLoginDto loginWithEmailAndPhoneNumber(AdminLoginDto adminLoginDto) {
-        AdminLogIn adminLogIn = adminLogInRepo.findByEmailOrPhoneNumber(adminLoginDto.getEmail(), adminLoginDto.getPhoneNumber())
+    public AdminLoginRespDto loginWithEmailAndPhoneNumber(AdminLoginRespDto adminLoginDto) {
+        AdminLogIn adminLogIn = adminLogInRepo.findByEmail(adminLoginDto.getEmail())
                 .orElseThrow(() -> new ExceptionHandling("Invalid credentials"));
 
         // Check if the provided password matches the stored password
-        if (passwordMatches(adminLoginDto.getPassword(), adminLogIn.getPassword())) {
-            return modelMapper.map(adminLogIn, AdminLoginDto.class);
+        if (adminLoginDto.getPassword().equals(adminLogIn.getPassword())) {
+            // Generate and return JWT token
+            String jwtToken = jwtService.generateToken((UserDetails) adminLogIn);
+            adminLoginDto.setJwtToken(jwtToken);
+            return adminLoginDto;
         } else {
             throw new ExceptionHandling("Invalid credentials");
         }
     }
+
+
+
 
     @Override
     public AdminLoginDto changePassword(AdminLoginDto adminLoginDto, String email, String phoneNumber) {

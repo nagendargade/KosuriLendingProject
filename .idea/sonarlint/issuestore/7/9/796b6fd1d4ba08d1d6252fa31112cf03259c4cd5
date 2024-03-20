@@ -1,0 +1,9 @@
+
+t	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ÇÉ÷„ûÿÿÿÿ
+V	java:S125"<This block of commented-out lines of code should be removed.(äÞ±¾úÿÿÿÿ
+l
+java:S1128"JRemove this unused import 'org.springframework.data.jpa.repository.Query'.(Äºöïþÿÿÿÿ8©…‰²å1
+M
+java:S1128"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ8ª…‰²å1
+Q
+java:S1128"/Remove this unused import 'java.util.Optional'.(¨˜ëÝüÿÿÿÿ8«…‰²å1

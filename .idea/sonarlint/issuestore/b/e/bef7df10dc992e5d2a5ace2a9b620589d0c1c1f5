@@ -1,0 +1,8 @@
+
+‚
+java:S1488J"`Immediately return this expression instead of assigning it to the temporary variable "jwtToken".(è½âÿùÿÿÿÿ8Ò¾¾«å1
+{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(žÏÌÔûÿÿÿÿ8ó„Æ¸ã1
+n
+java:S5998d"LRefactor this repetition that can lead to a stack overflow for large inputs.(ÿË‰¦þÿÿÿÿ8Ž®Å«å1
+I
+java:S1068"-Remove this unused "loginRepo" private field.(¢§›l8“®Å«å1

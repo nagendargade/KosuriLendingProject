@@ -17,7 +17,7 @@ public class FinancierRegistrationDto {
     private String pinCode;
     private UserType userType;
     private Boolean status;
-   // private String jwtToken;
+
 
 
 }
